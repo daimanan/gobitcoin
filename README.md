@@ -1,1 +1,1 @@
-# gobitcoin
+# gobitcoin使用GO语言实现一个比特币系统
