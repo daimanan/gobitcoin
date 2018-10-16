@@ -30,7 +30,6 @@ func BlockToHash(block *Block) []byte {
 		Uint64ToByte(block.TimeStamp),
 		Uint64ToByte(block.Difficulty),
 		Uint64ToByte(block.Nonce),
-		block.Hash,
 		block.Data,
 	}
 

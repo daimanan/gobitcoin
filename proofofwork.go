@@ -3,8 +3,7 @@ package main
 import (
 	"math/big"
 	"fmt"
-	"crypto/sha256"
-)
+	)
 
 type proofOfWorkInterface interface {
 	Run() (hash []byte, nonce uint64)
@@ -44,10 +43,15 @@ func (pow *ProofOfWork) Run() (hash []byte, nonce uint64) {
 //哈希值有效性的校验
 func (pow *ProofOfWork) IsValid() bool {
 	var hashInt big.Int
+	/*
 	//将当前的区块随机数转换为[]byte
 	data := Uint64ToByte(pow.block.Nonce)
 	//对data进行hash计算
 	hash := sha256.Sum256(data)
+	*/
+
+	hash := BlockToHash(pow.block)
+
 	//将hash值转换为hastInt
 	hashInt.SetBytes(hash[:])
 

@@ -20,5 +20,6 @@ func main() {
 		fmt.Printf("Difficuty : %d\n", block.Difficulty)
 		fmt.Printf("Nonce : %d\n", block.Nonce)
 		fmt.Printf("Data : %s\n", block.Data)
+		fmt.Printf("IsValid : %v\n", NewProofOfWork(block).IsValid())
 	}
 }
