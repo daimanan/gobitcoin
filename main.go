@@ -9,9 +9,8 @@ func main() {
 	bc.AddBlock("创建人获取100枚比特币")
 	bc.AddBlock("创建人获取500枚比特币")
 
-
 	//遍历区块链
-	for index,block:=range bc.blocks{
+	for index, block := range bc.blocks {
 		fmt.Println(" ============== current block index :", index)
 		fmt.Printf("Version : %d\n", block.Version)
 		fmt.Printf("PrevBlockHash : %x\n", block.PervHash)
@@ -22,5 +21,4 @@ func main() {
 		fmt.Printf("Nonce : %d\n", block.Nonce)
 		fmt.Printf("Data : %s\n", block.Data)
 	}
-
 }

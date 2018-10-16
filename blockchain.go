@@ -13,7 +13,6 @@ type BlockChain struct {
 func (bc *BlockChain) AddBlock(data string) {
 	lastBlock := bc.blocks[len(bc.blocks)-1]
 	block := NewBlock(data, lastBlock.Hash)
-	block.SetHash()
 	bc.blocks = append(bc.blocks, block)
 }
 

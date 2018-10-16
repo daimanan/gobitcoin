@@ -2,11 +2,7 @@ package main
 
 import (
 	"time"
-	"bytes"
-	"encoding/binary"
-	"log"
-	"crypto/sha256"
-)
+				)
 
 type blockInterface interface {
 	SetHash()
@@ -38,25 +34,20 @@ func NewBlock(data string, pervHash []byte) *Block {
 		Hash:       []byte{}, //初始化为空
 		Data:       []byte(data),
 	}
+
+	//引入算力
+	pow:=NewProofOfWork(&block)
+	hash, nonce := pow.Run()
+	block.Hash = hash
+	block.Nonce = nonce
 	return &block
-}
-
-//将Uint64转化为字符切片
-func Uint64ToByte(num uint64) []byte {
-	var buffer bytes.Buffer
-	//任意的数据转换成byte字节流
-	err := binary.Write(&buffer, binary.BigEndian, num)
-
-	if err != nil {
-		log.Panic(err)
-	}
-	return buffer.Bytes()
 }
 
 //生成哈希方式：
 //	1.将所有属性拼装起来
 //	2.再进行hash运算
 func (bc *Block) SetHash() {
+	/*
 	//将属性转化为字节切片
 	tmp := [][]byte{
 		Uint64ToByte(bc.Version),
@@ -75,4 +66,6 @@ func (bc *Block) SetHash() {
 	hash := sha256.Sum256(blockInfo)
 	//设置当前区块的哈希
 	bc.Hash = hash[:]
+	*/
+	bc.Hash = BlockToHash(bc)
 }
