@@ -9,7 +9,6 @@ import (
 )
 
 type blockInterface interface {
-	NewBlock(data string, pervHash []byte) *Block
 	SetHash()
 }
 
@@ -27,7 +26,7 @@ type Block struct {
 }
 
 //创建区块(构造)
-func (bc *Block) NewBlock(data string, pervHash []byte) *Block {
+func NewBlock(data string, pervHash []byte) *Block {
 	block := Block{
 		Version:    00,       //版本为00正式网络 01测试网络
 		PervHash:   pervHash, //前一区块的哈希(传值过来)
@@ -51,7 +50,7 @@ func Uint64ToByte(num uint64) []byte {
 	if err != nil {
 		log.Panic(err)
 	}
-	return nil
+	return buffer.Bytes()
 }
 
 //生成哈希方式：
