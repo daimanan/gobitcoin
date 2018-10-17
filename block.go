@@ -2,10 +2,14 @@ package main
 
 import (
 	"time"
-				)
+	"bytes"
+	"encoding/gob"
+	"log"
+)
 
 type blockInterface interface {
-	SetHash()
+	SetHash()                       //ver1 ver2时使用
+	Serialize() []byte              //Ver3:序列化
 }
 
 //区块结构
@@ -36,10 +40,37 @@ func NewBlock(data string, pervHash []byte) *Block {
 	}
 
 	//引入算力
-	pow:=NewProofOfWork(&block)
+	pow := NewProofOfWork(&block)
 	hash, nonce := pow.Run()
 	block.Hash = hash
 	block.Nonce = nonce
+	return &block
+}
+
+//序列化
+func (bc *Block) Serialize() []byte {
+	var buffer bytes.Buffer
+	encoder := gob.NewEncoder(&buffer)
+	err := encoder.Encode(&bc)
+	if err != nil {
+		log.Panic("区块编码失败：", err)
+	}
+	return buffer.Bytes()
+}
+
+//反序列化
+func Deserialize(data []byte) *Block {
+	if len(data) == 0 || data == nil {
+		return nil
+	}
+
+	var block Block
+	decoder := gob.NewDecoder(bytes.NewReader(data))
+	err := decoder.Decode(&block)
+	if err != nil {
+		log.Panic("区块解码失败：", err)
+	}
+
 	return &block
 }
 

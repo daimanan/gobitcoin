@@ -1,7 +1,5 @@
 package main
 
-import "fmt"
-
 //程序执行入口
 func main() {
 	//创建区块链
@@ -9,6 +7,7 @@ func main() {
 	bc.AddBlock("创建人获取100枚比特币")
 	bc.AddBlock("创建人获取500枚比特币")
 
+	/*
 	//遍历区块链
 	for index, block := range bc.blocks {
 		fmt.Println(" ============== current block index :", index)
@@ -22,4 +21,5 @@ func main() {
 		fmt.Printf("Data : %s\n", block.Data)
 		fmt.Printf("IsValid : %v\n", NewProofOfWork(block).IsValid())
 	}
+	*/
 }
