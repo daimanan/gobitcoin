@@ -112,7 +112,11 @@ func NewBlockChain() *BlockChain {
 
 			err = bucket.Put(genesis.Hash, genesis.Serialize()) //TODO
 			if err != nil {
-				log.Panic("向数据添加数据失败：", err)
+				log.Panic("向数据添加创世区块失败：", err)
+			}
+			err = bucket.Put([]byte(lastHashKey), genesis.Hash)
+			if err != nil {
+				log.Panic("向数据添加创世区块lastHashKey失败：", err)
 			}
 
 			//向内存更新创世区块的hash
@@ -138,8 +142,8 @@ func (bc *BlockChain) NewIterator() *BlockChainIterator {
 func (it *BlockChainIterator) Next() (block *Block) {
 	it.db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(blockBucket))
-		if bucket !=nil{
-			data:=bucket.Get(it.currentHash)
+		if bucket != nil {
+			data := bucket.Get(it.currentHash)
 			//根据前一个区块的哈希值 ，获取该区块
 			block = Deserialize(data)
 			//迭代器的指针指向下一移 前一区块的前一区块的hash
