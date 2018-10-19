@@ -5,6 +5,7 @@ import (
 	"github.com/boltdb/bolt"
 	"log"
 	"os"
+	"fmt"
 )
 
 //区块链数据库名
@@ -82,12 +83,22 @@ func NewGenesisBlock() *Block {
 	return NewBlock("创世区块", []byte{})
 }
 
-//区块链构造函数
-func NewBlockChain() *BlockChain {
-	//block := NewBlock("创世区块", []byte{})
-	//block.SetHash()
-	//blocks := []*Block{block}
+//检查数据文件是否存在
+func isDBExist() bool {
+	_, err := os.Stat(dbFile)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return true
+}
 
+//区块链初始化
+func InitBlockChain() *BlockChain {
+	//Ver4：改写命令行参数模式
+	if isDBExist() {
+		fmt.Println("数据文件已存在，无需创建")
+		os.Exit(1)
+	}
 	//Ver3：使用数据改写
 	var lastHash []byte
 
@@ -98,32 +109,54 @@ func NewBlockChain() *BlockChain {
 	}
 
 	db.Update(func(tx *bolt.Tx) error {
+		//没有buket，需要创建，并且创建一个创世块
+		genesis := NewGenesisBlock()
+		bucket, err := tx.CreateBucket([]byte(blockBucket))
+		if err != nil {
+			log.Panic("创建bolt数据失败：", err)
+		}
+
+		err = bucket.Put(genesis.Hash, genesis.Serialize()) //TODO
+		if err != nil {
+			log.Panic("向数据添加创世区块失败：", err)
+		}
+		err = bucket.Put([]byte(lastHashKey), genesis.Hash)
+		if err != nil {
+			log.Panic("向数据添加创世区块lastHashKey失败：", err)
+		}
+
+		//向内存更新创世区块的hash
+		lastHash = genesis.Hash
+		return nil
+	})
+	return &BlockChain{db, lastHash}
+}
+
+//获取区块句柄
+func GetBlockChainHandler() *BlockChain {
+	//Ver4：改写命令行参数模式
+	if !isDBExist() {
+		fmt.Println("数据文件不存，请先创建区块链文件")
+		os.Exit(1)
+	}
+	//Ver3：使用数据改写
+	var lastHash []byte
+
+	//打开数据库
+	db, err := bolt.Open(dbFile, 0600, nil)
+	if err != nil {
+		log.Panic("打开区块链数据" + dbFile + "出错")
+	}
+
+	db.View(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(blockBucket))
 		if bucket != nil {
 			//如果有，取出最后一个区块的hash值
 			lastHash = bucket.Get([]byte(lastHashKey))
-		} else {
-			//没有buket，需要创建，并且创建一个创世块
-			genesis := NewGenesisBlock()
-			bucket, err = tx.CreateBucket([]byte(blockBucket))
-			if err != nil {
-				log.Panic("创建bolt数据失败：", err)
-			}
-
-			err = bucket.Put(genesis.Hash, genesis.Serialize()) //TODO
-			if err != nil {
-				log.Panic("向数据添加创世区块失败：", err)
-			}
-			err = bucket.Put([]byte(lastHashKey), genesis.Hash)
-			if err != nil {
-				log.Panic("向数据添加创世区块lastHashKey失败：", err)
-			}
-
-			//向内存更新创世区块的hash
-			lastHash = genesis.Hash
 		}
 		return nil
 	})
+
 	return &BlockChain{db, lastHash}
 }
 

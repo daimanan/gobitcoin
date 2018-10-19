@@ -80,7 +80,7 @@ func (cli *CLI) Run() {
 				fmt.Println("添加区块数据不能为空")
 				cli.printUsage()
 			}
-			//cli.AddBlock(*addBlockPara)
+			cli.AddBlock(*addBlockPara)
 		}
 
 	case PrintChainCmdString:
@@ -91,7 +91,7 @@ func (cli *CLI) Run() {
 		}
 
 		if printChainCmd.Parsed() {
-			//cli.PrintChain()
+			cli.PrintChain()
 		}
 
 	default:

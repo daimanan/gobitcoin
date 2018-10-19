@@ -8,15 +8,16 @@ type cliInterface interface {
 	PrintChain()
 }
 
-/*
 //命令行添加区块
 func (cli *CLI) AddBlock(data string) {
-	cli.bc.AddBlock(data)
+	bc := GetBlockChainHandler()
+	bc.AddBlock(data)
 }
 
 //打印数据
 func (cli *CLI) PrintChain() {
-	it := cli.bc.NewIterator()
+	bc := GetBlockChainHandler()
+	it := bc.NewIterator()
 	for {
 		block := it.Next()
 		fmt.Println(" ============== current block ============== ")
@@ -35,11 +36,10 @@ func (cli *CLI) PrintChain() {
 		}
 	}
 }
-*/
 
 //创建区块链
 func (cli *CLI) CreateChain(address string) {
-	bc := NewBlockChain()
+	bc := InitBlockChain()
 	defer bc.db.Close()
 	fmt.Println("Create blockchain successfully!")
 }
