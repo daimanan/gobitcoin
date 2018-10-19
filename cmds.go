@@ -1,6 +1,8 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+)
 
 type cliInterface interface {
 	CreateChain(address string)
@@ -17,6 +19,7 @@ func (cli *CLI) AddBlock(data string) {
 //打印数据
 func (cli *CLI) PrintChain() {
 	bc := GetBlockChainHandler()
+	defer bc.db.Close()
 	it := bc.NewIterator()
 	for {
 		block := it.Next()
@@ -42,4 +45,19 @@ func (cli *CLI) CreateChain(address string) {
 	bc := InitBlockChain(address)
 	defer bc.db.Close()
 	fmt.Println("Create blockchain successfully!")
+}
+
+//获取余额
+func (cli *CLI) GetBalance(address string) {
+	bc := GetBlockChainHandler()
+	defer bc.db.Close()
+	utxos := bc.FindUTXOs(address)
+
+	//总金额
+	var total float64 = 0
+	for _, utxo := range utxos {
+		total += utxo.Value
+	}
+	//return total
+	fmt.Printf("用户%s的余额是%f", address, total)
 }

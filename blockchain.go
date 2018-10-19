@@ -138,6 +138,22 @@ func (bc *BlockChain) FindUTXOTransactions(address string) []Transaction {
 	return UTXOTransactions
 }
 
+//寻找录前地址能够使用的utxo
+func (bc *BlockChain) FindUTXOs(address string) []*TXOutput {
+	var UTXOs []*TXOutput
+	txs := bc.FindUTXOTransactions(address)
+	//遍历可用的交易，查找可以的output =>utxo
+	for _, tx := range txs {
+		for _, utxo := range tx.TXOutputs {
+			//当前地址可能的output的(是否能解锁)
+			if utxo.CanBeUnlockedWith(address) {
+				UTXOs = append(UTXOs, &utxo)
+			}
+		}
+	}
+	return UTXOs
+}
+
 //检查数据文件是否存在
 func isDBExist() bool {
 	_, err := os.Stat(dbFile)
@@ -167,7 +183,6 @@ func InitBlockChain(address string) *BlockChain {
 		//没有buket，需要创建，并且创建一个创世块
 		coinbase := NewCoinbaseTx(address, genesisInfo) //todo
 		genesis := NewGenesisBlock(coinbase)
-		fmt.Println("coinbase:", coinbase)
 		bucket, err := tx.CreateBucket([]byte(blockBucket))
 		if err != nil {
 			log.Panic("创建bolt数据失败：", err)
