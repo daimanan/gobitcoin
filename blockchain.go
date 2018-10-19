@@ -258,3 +258,34 @@ func (it *BlockChainIterator) Next() (block *Block) {
 	})
 	return
 }
+
+//所需要的合适的utxo集合
+//validUTXOs := make(map[string][]int64)
+//返回utxo的金额总和
+//total float64
+
+//从所有的交易里找到合适的utxo 和总金额
+func (bc *BlockChain) FindSuitableUTXOs(address string, amount float64) (map[string][]int64, float64) {
+	txs := bc.FindUTXOTransactions(address)
+	validUTXOs := make(map[string][]int64)
+	var total float64
+
+FIND:
+//遍历交易
+	for _, tx := range txs {
+		outputs := tx.TXOutputs
+		for index, output := range outputs {
+			if output.CanBeUnlockedWith(address) {
+				//判断当前收集的utxo金额是否大于所需要花进帐的金额
+				if total < amount {
+					total += output.Value
+					validUTXOs[string(tx.TXID)] = append(validUTXOs[string(tx.TXID)], int64(index))
+				} else {
+					break FIND
+				}
+			}
+		}
+	}
+
+	return validUTXOs,total
+}

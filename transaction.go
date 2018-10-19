@@ -6,6 +6,7 @@ import (
 	"log"
 	"crypto/sha256"
 	"fmt"
+	"os"
 )
 
 //挖矿交易收易
@@ -87,4 +88,54 @@ func NewCoinbaseTx(address string, data string) *Transaction {
 	tx.SetTXID()
 
 	return &tx //todo
+}
+
+//创建普通交易，完成send的辅助函数
+
+func NewTransaction(from, to string, amount float64, bc *BlockChain) *Transaction {
+	//用于支付的utxo
+	//map[string][]int64 key :交易id value:引用output地索引数组
+
+	//所需要的合理的utxo集合
+	//validUTXOs := make(map[string][]int64)
+	//返回utxo的金额总和
+	//var total float64
+
+
+	validUTXOs, total := bc.FindSuitableUTXOs(from, amount)
+	//余额不足
+	if total < amount {
+		fmt.Printf("余额不足")
+		os.Exit(1)
+	}
+
+	//余额可以支付
+	var inputs []TXInput
+	var outputs []TXOutput
+
+	//1.创建inputs
+	//进行output到input的转换
+	//遍历有效utxo的合集
+	for txId, outputIndexes := range validUTXOs {
+		//遍历所有引用的utxo的索引,每一个索引需要创建一个input
+		for _, index := range outputIndexes {
+			input := TXInput{[]byte(txId), int64(index), from}
+			inputs = append(inputs, input)
+
+		}
+	}
+
+	//2.创建outputs
+	output := TXOutput{amount, to}
+	outputs = append(outputs, output)
+
+	//余额大于支持金额，找零
+	if total > amount {
+		oddOutput := TXOutput{total - amount, from}
+		outputs = append(outputs, oddOutput)
+	}
+
+	tx := Transaction{nil, inputs, outputs}
+	tx.SetTXID()
+	return &tx
 }
