@@ -83,9 +83,59 @@ func (bc *BlockChain) AddBlock(txs []*Transaction) {
 }
 
 //查找指定地址能句支付的utxo的交易集合
-func (bc *BlockChain) FindUTXOTransactions(address string) []*Transaction {
-	
-	return nil
+func (bc *BlockChain) FindUTXOTransactions(address string) []Transaction {
+	//包含目标utxo的交易集合
+	var UTXOTransactions []Transaction
+	//存储使用的utxo的集合 map[交易id] []int64
+	spentUTXO := make(map[string][]int64)
+
+	//根据当前区块找到前一个区块
+	it := bc.NewIterator()
+	for {
+		//遍历区块
+		block := it.Next()
+		//遍历交易
+		for _, tx := range block.Transactions {
+			//如果不是挖矿交易
+			if !tx.IsCoinbase() {
+				//遍历input 目的：找到已经消耗过的utxo,
+				//需要两个字段来标识使用过的utxo：1.交易id 2.outputs的索引
+				for _, input := range tx.TXInputs {
+					if input.CanUnlockUTXOWith(address) {
+						spentUTXO[string(input.TXID)] = append(spentUTXO[string(input.TXID)], input.Vout)
+					}
+				}
+			}
+
+		OUTPUTS:
+		//遍历output 目的：找到所有能支配的utxo
+			for currIndex, output := range tx.TXOutputs {
+				//检查当前output是否已经消费，如果消费过，那到就进行下一个output检验
+				if spentUTXO[string(tx.TXID)] != nil {
+					//非空，代表当前交易有消费的utxo
+					indexes := spentUTXO[string(tx.TXID)]
+					for _, index := range indexes {
+						//当前的索引和消费的索引比较：相同表明output消耗了
+						//跳过，进行下一个output判断
+						if int64(currIndex) == index {
+							continue OUTPUTS
+						}
+					}
+				}
+
+				//如果当前地址是这个utxo的所有者，就满足条件
+				if output.CanBeUnlockedWith(address) {
+					UTXOTransactions = append(UTXOTransactions, *tx)
+				}
+			}
+		}
+
+		if len(block.PervHash) == 0 {
+			break
+		}
+	}
+
+	return UTXOTransactions
 }
 
 //检查数据文件是否存在

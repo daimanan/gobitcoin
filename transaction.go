@@ -11,7 +11,6 @@ import (
 //挖矿交易收易
 const reward = 12.5
 
-
 type transactionInterface interface {
 	SetTXID()
 	IsCoinbase() bool
@@ -74,7 +73,6 @@ type TXOutput struct {
 func (output *TXOutput) CanBeUnlockedWith(unlockData string) bool {
 	return output.ScriptPubKey == unlockData
 }
-
 
 //创建coinbae交易，只有收款人，没有付款人，是矿工的挖矿交易
 func NewCoinbaseTx(address string, data string) *Transaction {
