@@ -8,8 +8,8 @@ import (
 )
 
 type blockInterface interface {
-	SetHash()                       //ver1 ver2时使用
-	Serialize() []byte              //Ver3:序列化
+	SetHash()          //ver1 ver2时使用
+	Serialize() []byte //Ver3:序列化
 }
 
 //区块结构
@@ -20,23 +20,33 @@ type Block struct {
 	TimeStamp  uint64 //时间戳
 	Difficulty uint64 //难度值（挖矿生成哈希值的难度 ）
 	Nonce      uint64 //随机数
+	Hash       []byte //哈希值
 
-	Hash []byte //哈希值
-	Data []byte //交易数据
+	//Ver4之前使用
+	//Data []byte //交易数据
+
+	//Ver4：使用交易改写
+	Transactions []*Transaction //交易信息
 }
 
 //创建区块(构造)
-func NewBlock(data string, pervHash []byte) *Block {
+//Ver4：使用交易改写生成区块
+func NewBlock(txs []*Transaction, pervHash []byte) *Block {
 	block := Block{
 		Version:    00,       //版本为00正式网络 01测试网络
 		PervHash:   pervHash, //前一区块的哈希(传值过来)
 		MerkelRoot: []byte{}, //先设为空
 		//设为当前系统的时间
 		TimeStamp:  uint64(time.Now().Unix()),
-		Difficulty: 0,        //开发与测试设为0
-		Nonce:      0,        //开发与测试设为0
-		Hash:       []byte{}, //初始化为空
-		Data:       []byte(data),
+		Difficulty: 0, //开发与测试设为0
+		Nonce:      0, //开发与测试设为0
+
+		//ver4之前使用
+		//Hash:       []byte{}, //初始化为空
+		//Data:       []byte(data),
+
+		//Ver4：使用交易改写
+		Transactions: txs,
 	}
 
 	//引入算力
@@ -99,4 +109,9 @@ func (bc *Block) SetHash() {
 	bc.Hash = hash[:]
 	*/
 	bc.Hash = BlockToHash(bc)
+}
+
+//创世区块生成
+func NewGenesisBlock(coinbase *Transaction) *Block {
+	return NewBlock([]*Transaction{coinbase}, []byte{}) //创世区块的前区块是空
 }

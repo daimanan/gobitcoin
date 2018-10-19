@@ -11,6 +11,7 @@ import (
 const usage = `
 	createChain --address ADDRESS "创建一个区块"
 	addBlock --data DATA "添加一个区块到区块链中"
+	send --from FROM --to TO --amount AMOUNT "由 FROM 给 TO 转款 AMOUNT"
 	printChain           "打印所有区块信息"
 `
 const CreateBlockCmdString = "createChain"

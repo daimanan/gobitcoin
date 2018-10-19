@@ -13,9 +13,13 @@ const dbFile = "blockchain.db"
 const blockBucket = "bucket"
 const lastHashKey = "LastHashKey"
 
+//创世区块信息
+const genesisInfo = "The Times 03/Jan/2009 Chancellor on brink of second bailout for banks"
+
 type blockChainInterface interface {
-	AddBlock(data string)
+	AddBlock(txs []*Transaction)
 	NewIterator() *BlockChainIterator
+	FindUTXOTransactions(address string) []*Transaction
 }
 
 //区块链
@@ -31,7 +35,7 @@ type BlockChain struct {
 }
 
 //添加区块到区块链中
-func (bc *BlockChain) AddBlock(data string) {
+func (bc *BlockChain) AddBlock(txs []*Transaction) {
 	//Ver1 Ver2版本使用
 	//lastBlock := bc.blocks[len(bc.blocks)-1]
 	//block := NewBlock(data, lastBlock.Hash)
@@ -53,7 +57,7 @@ func (bc *BlockChain) AddBlock(data string) {
 	})
 
 	//向本地数据库定入区块
-	block := NewBlock(data, prevBlockHash)
+	block := NewBlock(txs, prevBlockHash)
 	err := bc.db.Update(func(tx *bolt.Tx) error {
 		bucket := tx.Bucket([]byte(blockBucket))
 		if bucket == nil {
@@ -78,9 +82,10 @@ func (bc *BlockChain) AddBlock(data string) {
 	}
 }
 
-//创世区块生成
-func NewGenesisBlock() *Block {
-	return NewBlock("创世区块", []byte{})
+//查找指定地址能句支付的utxo的交易集合
+func (bc *BlockChain) FindUTXOTransactions(address string) []*Transaction {
+	
+	return nil
 }
 
 //检查数据文件是否存在
@@ -92,8 +97,8 @@ func isDBExist() bool {
 	return true
 }
 
-//区块链初始化
-func InitBlockChain() *BlockChain {
+//区块链初始化 创建数据文件
+func InitBlockChain(address string) *BlockChain {
 	//Ver4：改写命令行参数模式
 	if isDBExist() {
 		fmt.Println("数据文件已存在，无需创建")
@@ -110,7 +115,9 @@ func InitBlockChain() *BlockChain {
 
 	db.Update(func(tx *bolt.Tx) error {
 		//没有buket，需要创建，并且创建一个创世块
-		genesis := NewGenesisBlock()
+		coinbase := NewCoinbaseTx(address, genesisInfo) //todo
+		genesis := NewGenesisBlock(coinbase)
+		fmt.Println("coinbase:", coinbase)
 		bucket, err := tx.CreateBucket([]byte(blockBucket))
 		if err != nil {
 			log.Panic("创建bolt数据失败：", err)

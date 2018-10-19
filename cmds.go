@@ -10,8 +10,8 @@ type cliInterface interface {
 
 //命令行添加区块
 func (cli *CLI) AddBlock(data string) {
-	bc := GetBlockChainHandler()
-	bc.AddBlock(data)
+	//bc := GetBlockChainHandler()
+	//bc.AddBlock(data) //TODO
 }
 
 //打印数据
@@ -28,7 +28,7 @@ func (cli *CLI) PrintChain() {
 		fmt.Printf("TimeStamp : %d\n", block.TimeStamp)
 		fmt.Printf("Difficuty : %d\n", block.Difficulty)
 		fmt.Printf("Nonce : %d\n", block.Nonce)
-		fmt.Printf("Data : %s\n", block.Data)
+		//fmt.Printf("Data : %s\n", block.Data) //TODO
 		fmt.Printf("IsValid : %v\n", NewProofOfWork(block).IsValid())
 		if len(block.PervHash) == 0 {
 			fmt.Println(" ==============  print over  ============== ")
@@ -39,7 +39,7 @@ func (cli *CLI) PrintChain() {
 
 //创建区块链
 func (cli *CLI) CreateChain(address string) {
-	bc := InitBlockChain()
+	bc := InitBlockChain(address)
 	defer bc.db.Close()
 	fmt.Println("Create blockchain successfully!")
 }
