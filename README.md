@@ -2,6 +2,16 @@
 
 - 版本升级
 
+  - 2019-10-19
+
+    - 添加创建区块命令行
+
+    ```bash
+    createChain --address ADDRESS "创建一个区块"
+    addBlock --data DATA "添加一个区块到区块链中"
+    printChain           "打印所有区块信息"
+    ```
+
   - 2018-10-18 
 
        - 添加windows测试用批处理

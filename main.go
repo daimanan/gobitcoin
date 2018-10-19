@@ -1,13 +1,10 @@
 package main
 
-import "fmt"
-
 //程序执行入口
 func main() {
 	//创建区块链
-	bc := NewBlockChain()
-	fmt.Println(bc)
-	cli:=CLI{bc}
+	//bc := NewBlockChain()
+	cli:=CLI{}
 	cli.Run()
 
 	//bc.AddBlock("创建人获取100枚比特币")

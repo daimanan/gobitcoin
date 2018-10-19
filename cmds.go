@@ -3,10 +3,12 @@ package main
 import "fmt"
 
 type cliInterface interface {
+	CreateChain(address string)
 	AddBlock(data string)
 	PrintChain()
 }
 
+/*
 //命令行添加区块
 func (cli *CLI) AddBlock(data string) {
 	cli.bc.AddBlock(data)
@@ -27,9 +29,17 @@ func (cli *CLI) PrintChain() {
 		fmt.Printf("Nonce : %d\n", block.Nonce)
 		fmt.Printf("Data : %s\n", block.Data)
 		fmt.Printf("IsValid : %v\n", NewProofOfWork(block).IsValid())
-		if len(block.PervHash) == 0{
+		if len(block.PervHash) == 0 {
 			fmt.Println(" ==============  print over  ============== ")
 			break
 		}
 	}
+}
+*/
+
+//创建区块链
+func (cli *CLI) CreateChain(address string) {
+	bc := NewBlockChain()
+	defer bc.db.Close()
+	fmt.Println("Create blockchain successfully!")
 }
