@@ -31,7 +31,6 @@ func (cli *CLI) PrintChain() {
 		fmt.Printf("TimeStamp : %d\n", block.TimeStamp)
 		fmt.Printf("Difficuty : %d\n", block.Difficulty)
 		fmt.Printf("Nonce : %d\n", block.Nonce)
-		//fmt.Printf("Data : %s\n", block.Data) //TODO
 		fmt.Printf("IsValid : %v\n", NewProofOfWork(block).IsValid())
 		if len(block.PervHash) == 0 {
 			fmt.Println(" ==============  print over  ============== ")

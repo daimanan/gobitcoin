@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"encoding/gob"
 	"log"
+	"crypto/sha256"
 )
 
 type blockInterface interface {
@@ -114,4 +115,20 @@ func (bc *Block) SetHash() {
 //创世区块生成
 func NewGenesisBlock(coinbase *Transaction) *Block {
 	return NewBlock([]*Transaction{coinbase}, []byte{}) //创世区块的前区块是空
+}
+
+//块内所有交易的哈希(简单的模拟一下梅克尔树) 将交易的hash值拼接
+func (block *Block) HashTransaction() []byte {
+	var txHashes [][]byte
+	txs:=block.Transactions
+	//遍历交易
+	for _,tx:=range txs{
+		//拼接所有的交易
+		txHashes =append(txHashes,tx.TXID)
+	}
+
+	//对二维切片进行拼接 ,生成一维切片
+	data:=bytes.Join(txHashes,[]byte{})
+	hash := sha256.Sum256(data)
+	return hash[:]
 }

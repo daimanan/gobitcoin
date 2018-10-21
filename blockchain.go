@@ -181,14 +181,14 @@ func InitBlockChain(address string) *BlockChain {
 
 	db.Update(func(tx *bolt.Tx) error {
 		//没有buket，需要创建，并且创建一个创世块
-		coinbase := NewCoinbaseTx(address, genesisInfo) //todo
+		coinbase := NewCoinbaseTx(address, genesisInfo)
 		genesis := NewGenesisBlock(coinbase)
 		bucket, err := tx.CreateBucket([]byte(blockBucket))
 		if err != nil {
 			log.Panic("创建bolt数据失败：", err)
 		}
 
-		err = bucket.Put(genesis.Hash, genesis.Serialize()) //TODO
+		err = bucket.Put(genesis.Hash, genesis.Serialize())
 		if err != nil {
 			log.Panic("向数据添加创世区块失败：", err)
 		}

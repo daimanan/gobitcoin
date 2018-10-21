@@ -87,7 +87,7 @@ func NewCoinbaseTx(address string, data string) *Transaction {
 	tx := Transaction{[]byte{}, []TXInput{input}, []TXOutput{output}}
 	tx.SetTXID()
 
-	return &tx //todo
+	return &tx
 }
 
 //创建普通交易，完成send的辅助函数

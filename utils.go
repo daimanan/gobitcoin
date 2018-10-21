@@ -22,6 +22,7 @@ func Uint64ToByte(num uint64) []byte {
 
 //区块转Hash值
 func BlockToHash(block *Block) []byte {
+	block.MerkelRoot = block.HashTransaction()
 	//将属性转化为字节切片
 	tmp := [][]byte{
 		Uint64ToByte(block.Version),
@@ -30,7 +31,7 @@ func BlockToHash(block *Block) []byte {
 		Uint64ToByte(block.TimeStamp),
 		Uint64ToByte(block.Difficulty),
 		Uint64ToByte(block.Nonce),
-		//block.Transactions.TransactionHash(),//TODO
+		block.MerkelRoot,
 	}
 
 	//合并字节流
