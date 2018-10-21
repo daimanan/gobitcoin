@@ -82,11 +82,11 @@ func (bc *BlockChain) AddBlock(txs []*Transaction) {
 	}
 }
 
-//查找指定地址能句支付的utxo的交易集合
+//查找指定地址能够支付的utxo的交易集合
 func (bc *BlockChain) FindUTXOTransactions(address string) []Transaction {
 	//包含目标utxo的交易集合
 	var UTXOTransactions []Transaction
-	//存储使用的utxo的集合 map[交易id] []int64
+	//存储使用过的utxo的集合 map[交易id] []int64
 	spentUTXO := make(map[string][]int64)
 
 	//根据当前区块找到前一个区块
@@ -139,15 +139,15 @@ func (bc *BlockChain) FindUTXOTransactions(address string) []Transaction {
 }
 
 //寻找录前地址能够使用的utxo
-func (bc *BlockChain) FindUTXOs(address string) []*TXOutput {
-	var UTXOs []*TXOutput
+func (bc *BlockChain) FindUTXOs(address string) []TXOutput {
+	var UTXOs []TXOutput
 	txs := bc.FindUTXOTransactions(address)
 	//遍历可用的交易，查找可以的output =>utxo
 	for _, tx := range txs {
 		for _, utxo := range tx.TXOutputs {
 			//当前地址可能的output的(是否能解锁)
 			if utxo.CanBeUnlockedWith(address) {
-				UTXOs = append(UTXOs, &utxo)
+				UTXOs = append(UTXOs, utxo)
 			}
 		}
 	}
@@ -270,13 +270,13 @@ func (bc *BlockChain) FindSuitableUTXOs(address string, amount float64) (map[str
 	validUTXOs := make(map[string][]int64)
 	var total float64
 
-FIND:
-//遍历交易
+	FIND:
+	//遍历交易
 	for _, tx := range txs {
 		outputs := tx.TXOutputs
 		for index, output := range outputs {
 			if output.CanBeUnlockedWith(address) {
-				//判断当前收集的utxo金额是否大于所需要花进帐的金额
+				//判断当前收集的utxo金额是否大于所需要花费进帐的金额
 				if total < amount {
 					total += output.Value
 					validUTXOs[string(tx.TXID)] = append(validUTXOs[string(tx.TXID)], int64(index))
@@ -287,5 +287,5 @@ FIND:
 		}
 	}
 
-	return validUTXOs,total
+	return validUTXOs, total
 }

@@ -101,7 +101,6 @@ func NewTransaction(from, to string, amount float64, bc *BlockChain) *Transactio
 	//返回utxo的金额总和
 	//var total float64
 
-
 	validUTXOs, total := bc.FindSuitableUTXOs(from, amount)
 	//余额不足
 	if total < amount {
@@ -121,7 +120,6 @@ func NewTransaction(from, to string, amount float64, bc *BlockChain) *Transactio
 		for _, index := range outputIndexes {
 			input := TXInput{[]byte(txId), int64(index), from}
 			inputs = append(inputs, input)
-
 		}
 	}
 

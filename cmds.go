@@ -61,3 +61,11 @@ func (cli *CLI) GetBalance(address string) {
 	//return total
 	fmt.Printf("用户%s的余额是%f", address, total)
 }
+
+func (cli *CLI) Send(from, to string, amount float64) {
+	bc := GetBlockChainHandler()
+	defer bc.db.Close()
+	tx := NewTransaction(from, to, amount, bc)
+	bc.AddBlock([]*Transaction{tx})
+	fmt.Println("send 转账成功")
+}

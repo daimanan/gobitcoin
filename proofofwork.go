@@ -59,11 +59,11 @@ func (pow *ProofOfWork) IsValid() bool {
 	return hashInt.Cmp(pow.target) == -1
 }
 
+//算力难度值
+const  TARGET_BITS  = 0
 //区块工作证明构造
 func NewProofOfWork(block *Block) *ProofOfWork {
-	var pow ProofOfWork
-	pow.block = block
-
+	/*//第一种写法：固定值写法
 	//难度值，先写成固定值
 	targetString := "0000100000000000000000000000000000000000000000000000000000000000"
 	var bigIntTemp big.Int
@@ -71,6 +71,15 @@ func NewProofOfWork(block *Block) *ProofOfWork {
 	bigIntTemp.SetString(targetString, 16)
 
 	pow.target = &bigIntTemp
+	*/
 
+	//设置算力难度系数
+	target:=big.NewInt(1)
+	target.Lsh(target,uint(256-TARGET_BITS))
+
+	var pow ProofOfWork
+	pow.block = block
+
+	pow.target =target
 	return &pow
 }
