@@ -67,7 +67,6 @@ func (cli *CLI) Run() {
 	amountPara := sendCmd.Float64("amount", 0, "amount info!")
 	switch os.Args[1] {
 	case CreateBlockCmdString:
-		fmt.Println("CreateBlockCmdString:", string(*createBlockPara))
 		//创建区块数据库
 		//1.解析命令行
 		err := createBlockCmd.Parse(os.Args[2:])
